@@ -1,0 +1,27 @@
+# Dependencies
+/node_modules
+/package-lock.json
+
+# Logs and temporary files
+*.log
+*.gz
+/npm-debug.log*
+.nyc_output
+/coverage
+
+# Environment variables
+.env
+.env.local
+
+# Build artifacts
+/dist
+/build
+/tmp
+
+# IDE specific files (optional, depends on your editor)
+.vscode/
+.idea/
+
+# OS specific files
+.DS_Store
+Thumbs.db
