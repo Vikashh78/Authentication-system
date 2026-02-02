@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import generateToken from '../utils/token.util.js'
 import userModel from '../models/user.model.js'
 import validate from 'validator'
+import sendEmail from '../config/nodeMailer.config.js'
 
 
 // Function to register new user
@@ -59,6 +60,11 @@ const userRegister = async (req, res) => {
             sameSite: process.env.NODE_ENV === 'production'? 'none' : 'strict',
             maxAge: 7 * 24 * 60 * 60 * 1000 //milisec
         }
+
+        // Sending user a welcome email
+        const sub = 'Welcome to Srma'
+        const body = `Welcome to Srma world! Your account with email: ${email} has been created successfully.`
+        await sendEmail(email, sub, body);
 
         return res
         .status(201)
