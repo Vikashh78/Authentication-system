@@ -177,4 +177,39 @@ const logoutUser = async (req, res) => {
     }
 }
 
+
+const verifyOtp = async (req, res) => {
+    const {userId} = req.userId
+    try {
+        const user = await userModel.findById(userId)
+        if(!user) {
+            return res.status(401).json({
+                success: false,
+                message: "User does not exits"
+            })
+        }
+
+        if(user.isAccountVerified) {
+            return res.status(401).json({
+                success: false,
+                message: "User already verified"
+            })
+        }
+
+        const otp = Math.floor(100000+Math.random()*900000) 
+        user.verifyOtp = otp
+        user.isAccountVerified = true
+        user.resetOtpExpiresAt = Date.now() + 24*60*60*1000
+
+        
+
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 export { userRegister, userLogin, logoutUser }
