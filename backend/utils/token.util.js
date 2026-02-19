@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 
 const generateToken = async (userId) => {
 
-    const payload = { id: userId }
+    const payload = { _id: userId }
 
     const token = jwt.sign(
         payload,

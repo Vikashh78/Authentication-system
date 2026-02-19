@@ -135,7 +135,7 @@ const userLogin = async (req, res) => {
 
         return res
         .status(200)
-        .cookie('token', token, options)
+        .cookie("token", token, options)
         .json({
             success: true,
             message: 'Logged in successfully'
@@ -178,30 +178,42 @@ const logoutUser = async (req, res) => {
 }
 
 
-const verifyOtp = async (req, res) => {
-    const {userId} = req.userId
+const sendVerifyOtp = async (req, res) => {
+
+    const userId = req?.userId
+    
     try {
         const user = await userModel.findById(userId)
+        
         if(!user) {
             return res.status(401).json({
                 success: false,
                 message: "User does not exits"
             })
         }
-
         if(user.isAccountVerified) {
             return res.status(401).json({
                 success: false,
                 message: "User already verified"
             })
         }
-
         const otp = Math.floor(100000+Math.random()*900000) 
         user.verifyOtp = otp
         user.isAccountVerified = true
-        user.resetOtpExpiresAt = Date.now() + 24*60*60*1000
-
+        user.verifyOtpExpiresAt = Date.now() + 24*60*60*1000
         
+        await user.save()
+
+        await sendEmail(
+            user.email,
+            'Account verification otp',
+            `Your otp for account verification is ${otp}. Use this otp to verify the account do not share with anyone.`
+        )
+
+        return res.status(200).json({
+            success: true,
+            message: 'Otp has been sent to your email'
+        })
 
     } catch (error) {
         console.log(error.message);
@@ -212,4 +224,57 @@ const verifyOtp = async (req, res) => {
     }
 }
 
-export { userRegister, userLogin, logoutUser }
+
+const verifyEmail = async (req, res) => {
+
+    const userId = req.userId
+    const { otp } = req.body
+    
+    if(!userId || !otp) {
+        return res.status(400).json({
+            success: false,
+            message: "Missing details"
+        })
+    }
+    try {
+        const user = await userModel.findById(userId)
+        if(!user) {
+            return res.status(401).json({success: false, message: 'User not found'})
+        }
+
+        if(user.verifyOtp === '' || user.verifyOtp !== otp) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid otp"
+            })
+        }
+
+        if(user.verifyOtpExpiresAt < Date.now()) {
+            return res.status(401).json({
+                success: false,
+                message: 'OTP expired'
+            })
+        }
+
+        user.isAccountVerified = true
+        user.verifyOtp = ''
+        user.verifyOtpExpiresAt = 0
+        await user.save()
+
+        return res.status(200).json({
+            success: true,
+            message: 'Email verified successfully'
+        })
+
+    } catch (error) {
+        return res.status(500).json({success: false, message: error.message})
+    }
+}
+
+export { 
+    userRegister, 
+    userLogin, 
+    logoutUser,
+    sendVerifyOtp,
+    verifyEmail 
+}
