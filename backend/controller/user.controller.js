@@ -200,7 +200,7 @@ const sendVerifyOtp = async (req, res) => {
         const otp = Math.floor(100000+Math.random()*900000) 
         user.verifyOtp = otp
         user.isAccountVerified = true
-        user.verifyOtpExpiresAt = Date.now() + 24*60*60*1000
+        user.verifyOtpExpiresAt = Date.now() + 24*60*60*1000 //ms
         
         await user.save()
 
@@ -271,10 +271,126 @@ const verifyEmail = async (req, res) => {
     }
 }
 
+const isAuthenticated = async (_ , res) => {
+    try {
+        return res.status(200).json({
+            success: true,
+            message: 'User is authenticated'
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+// Send password reset otp
+const sendResetOtp = async (req, res) => {
+
+    const { email } = req.body
+    if(!email) {
+        return res.status(400).json({
+            success: false,
+            message: 'Email address is required!'
+        })
+    }
+
+    try {
+        const user = await userModel.findOne({email})
+        if(!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not found'
+            })
+        }
+
+        const otp = Math.floor(100000 + Math.random()*900000)
+        user.resetOtp = otp
+        user.resetOtpExpiresAt = Date.now() + 10*60*1000 //10 mins
+        
+        await user.save()
+
+        await sendEmail(
+            email,
+            'Password reset OTP',
+            `Your otp to reset password is ${otp}. This otp is only valid for 10 minutes do not share with any one. Use this otp to reset your password.`
+        )
+
+        return res.status(200).json({
+            success: true,
+            message: 'OTP has been sent on email'
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+// Reset password
+const resetPassword = async (req, res) => {
+    
+    const { email, otp, newPass } = req.body
+
+    if(!email || !otp || !newPass) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing details'
+        })
+    }
+
+    try {
+        const user = await userModel.findOne({email})
+
+        if(user.resetOtp === '' || user.resetOtp !== otp) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid otp'
+            })
+        }
+
+        if(user.resetOtpExpiresAt < Date.now()) {
+            return res.status(401).json({success: false, message: 'OTP expired'})
+        }
+
+        const salt = await bcrypt.genSalt(10)
+        const hassed_pass = await bcrypt.hash(newPass, salt)
+
+        user.password = hassed_pass
+        user.resetOtp = ''
+        user.resetOtpExpiresAt = 0
+
+        await user.save()
+
+        await sendEmail(
+            email,
+            'Password changed successfully',
+            `Dear user your password has been changed successfully for the account associated with email ${email}.`
+        )
+
+        return res.status(200).json({
+            success: true,
+            message: 'Password reset successfully'
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({success: false, message: error.message})
+    }
+}
+
 export { 
     userRegister, 
     userLogin, 
     logoutUser,
     sendVerifyOtp,
-    verifyEmail 
+    verifyEmail,
+    isAuthenticated,
+    sendResetOtp,
+    resetPassword 
 }

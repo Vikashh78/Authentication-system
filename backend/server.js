@@ -5,6 +5,7 @@ import cors from 'cors'
 import http from 'http'
 import connectDB from './config/db.config.js'
 import userRouter from './routes/user.route.js'
+import userDataRouter from './routes/userData.route.js'
 
 
 const app = express()
@@ -19,6 +20,7 @@ app.use(cookieParser())
 
 // API Endpoints
 app.use('/api/user/', userRouter);
+app.use('/api/user-data/', userDataRouter)
 
 app.get('/', (req, res) => {
     res.send(`API is working`)
