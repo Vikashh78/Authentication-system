@@ -5,7 +5,7 @@ import authUser from '../middleware/authUser.middleware.js'
 const userRouter = express.Router()
 
 userRouter.post('/register', userRegister)
-userRouter.get('/login', userLogin)
+userRouter.post('/login', userLogin)
 userRouter.post('/logout', logoutUser)
 
 userRouter.post('/send-verify-otp', authUser, sendVerifyOtp)

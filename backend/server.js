@@ -15,7 +15,10 @@ const server = http.createServer(app)
 connectDB()
 
 app.use(json())
-app.use(cors({Credential: true}))
+app.use(cors({
+    origin: ["http://localhost:5173"],
+    credentials: true
+}))
 app.use(cookieParser())
 
 // API Endpoints
