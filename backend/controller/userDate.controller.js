@@ -10,13 +10,16 @@ const userData = async (req, res) => {
             return res.status(401).json({success: false, message: 'User not found'})
         }
 
+        const userData = {
+            name: user.name,
+            email: user.email,
+            isAccountVerified: user.isAccountVerified
+        }
+        console.log("UserData", userData);
+        
         return res.status(200).json({
             success: true,
-            userData: {
-                name: user.name,
-                email: user.email,
-                isAccountVerified: user.isAccountVerified
-            }
+            userData: userData
         })
 
     } catch (error) {

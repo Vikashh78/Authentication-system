@@ -1,16 +1,17 @@
-import React, {useContext, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {assets} from '../assets/assets'
 import {useNavigate} from 'react-router-dom'
 import axios from 'axios'
 import {toast} from 'react-toastify'
-import { AppContext } from '../context/AuthContext'
+import { AuthContext } from '../context/AuthContext'
 
 const Login = () => {
 
   const navigate = useNavigate()
-  const { backendURL, setIsLoggedin, getUserData} = useContext(AppContext)
 
-  const [state, setState] = useState('Sign Up')
+  const { backendURL, setIsLoggedin, getUserData, isLoggedin } = useContext(AuthContext)
+
+  const [state, setState] = useState('Login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -20,21 +21,20 @@ const Login = () => {
     e.preventDefault();
     try {
       axios.defaults.withCredentials = true // To send cookies
+
       if(state === 'Sign Up') {
         const response = await axios.post(backendURL+'/api/user/register', {name, email, password})                
-        if(response.data.success) {
+        if(response.data.success){
           setIsLoggedin(true)
-          getUserData()
-          navigate('/')
+          navigate('/')        
         }
       }
       
       else {
         const response = await axios.post(backendURL+'/api/user/login', {email, password}) 
              
-        if(response.data.success) {
+        if(response.data.success){
           setIsLoggedin(true)
-          getUserData()
           navigate('/')
         }
       }
@@ -44,6 +44,7 @@ const Login = () => {
       toast.error(error.response.data.message)
     }
   }
+
 
   return (
     <div className='flex items-center justify-center min-h-screen px-6 sm:px-0 bg-linear-to-br from-blue-200 to-purple-400'>  
@@ -71,7 +72,7 @@ const Login = () => {
             className='bg-transparent outline-none' type="password" placeholder='Password' required />
           </div>
           <p onClick={()=>navigate('/reset-password')} className='mb-4 text-gray-400 cursor-pointer'>Forget password</p>
-          <button className='w-full py-2.5 font-medium text-white bg-linear-to-br from-indigo-500 to-blue-400 rounded-full mb-4 cursor-pointer'>{state}</button>
+          <button type='submit' className='w-full py-2.5 font-medium text-white bg-linear-to-br from-indigo-500 to-blue-400 rounded-full mb-4 cursor-pointer'>{state}</button>
         </form>
         {
           state === 'Sign Up'? 
