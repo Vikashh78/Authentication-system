@@ -26,6 +26,8 @@ const Login = () => {
         const response = await axios.post(backendURL+'/api/user/register', {name, email, password})                
         if(response.data.success){
           setIsLoggedin(true)
+          getUserData()
+          setIsLoggedin(true)
           navigate('/')        
         }
       }
@@ -34,6 +36,8 @@ const Login = () => {
         const response = await axios.post(backendURL+'/api/user/login', {email, password}) 
              
         if(response.data.success){
+          setIsLoggedin(true)
+          getUserData()
           setIsLoggedin(true)
           navigate('/')
         }

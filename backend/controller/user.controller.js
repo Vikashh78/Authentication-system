@@ -157,7 +157,7 @@ const logoutUser = async (req, res) => {
         const options = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production'? 'none' : 'strict'
+            sameSite: process.env.NODE_ENV === 'production'? 'none' : 'strict',
         }
 
         return res
@@ -199,7 +199,6 @@ const sendVerifyOtp = async (req, res) => {
         }
         const otp = Math.floor(100000+Math.random()*900000) 
         user.verifyOtp = otp
-        user.isAccountVerified = true
         user.verifyOtpExpiresAt = Date.now() + 24*60*60*1000 //ms
         
         await user.save()
@@ -212,7 +211,7 @@ const sendVerifyOtp = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: 'Otp has been sent to your email'
+            message: 'OTP send to email'
         })
 
     } catch (error) {
@@ -271,11 +270,12 @@ const verifyEmail = async (req, res) => {
     }
 }
 
-const isAuthenticated = async (_ , res) => {
+const isAuthenticated = (req , res) => {
     try {
         return res.status(200).json({
             success: true,
-            message: 'User is authenticated'
+            message: 'User is authenticated',
+            userId: req.userId
         })
 
     } catch (error) {

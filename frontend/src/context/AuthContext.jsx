@@ -8,12 +8,13 @@ export const AuthContextProvider = (props) => {
 
     const backendURL = import.meta.env.VITE_BACKEND_URL
     const [isLoggedin, setIsLoggedin] = useState(false)
-    const [userData, setUserData] = useState({})
+    const [userData, setUserData] = useState(false)
 
+    axios.defaults.withCredentials = true;
 
     const getUserData = async () => {
         try {
-            const { data } = await axios.get(backendURL + '/api/user-data/data', { withCredentials: true })
+            const { data } = await axios.get(backendURL + '/api/user-data/data')
 
             if (data.success) {
                 setUserData(data.userData)
@@ -25,26 +26,23 @@ export const AuthContextProvider = (props) => {
         }
     }
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const res = await axios.post(
-                    backendURL + '/api/user/is-auth',
-                    {},
-                    { withCredentials: true }
-                )
-
+    const getAuthStatus = async () => {
+        try {
+            const res = await axios.post(
+                backendURL + '/api/user/is-auth')
                 if (res.data.success) {
                     setIsLoggedin(true)
-                    await getUserData()   
+                    await getUserData()
                 }
-            } catch (error) {
-                setIsLoggedin(false)
-            }
-        }
 
-        checkAuth()
-    }, [])
+        } catch (error) {
+            setIsLoggedin(false)
+        }
+    }
+
+    useEffect(()=>{
+        getAuthStatus()
+    },[])
 
 
     const value = {

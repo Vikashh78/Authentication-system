@@ -15,7 +15,6 @@ const userData = async (req, res) => {
             email: user.email,
             isAccountVerified: user.isAccountVerified
         }
-        console.log("UserData", userData);
         
         return res.status(200).json({
             success: true,
