@@ -9,7 +9,7 @@ const Login = () => {
 
   const navigate = useNavigate()
 
-  const { backendURL, setIsLoggedin, getUserData, isLoggedin } = useContext(AuthContext)
+  const { backendURL, setIsLoggedin, getUserData, isLoggedin, userData } = useContext(AuthContext)
 
   const [state, setState] = useState('Login')
   const [name, setName] = useState('')
@@ -48,6 +48,10 @@ const Login = () => {
       toast.error(error.response.data.message)
     }
   }
+
+  useEffect(()=>{
+    isLoggedin && userData && navigate('/')
+  },[isLoggedin, userData])
 
 
   return (
