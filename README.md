@@ -6,10 +6,8 @@
 
 ## 🌐 Live Demo
 
-Frontend: https://your-frontend.vercel.app  
-Backend API: https://your-backend.vercel.app
-
-*(Update links after deployment)*
+Frontend:   
+Backend API: 
 
 ---
 
