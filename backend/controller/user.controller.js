@@ -3,6 +3,7 @@ import generateToken from '../utils/token.util.js'
 import userModel from '../models/user.model.js'
 import validate from 'validator'
 import sendEmail from '../config/nodeMailer.config.js'
+import { EMAIL_VERIFY_TEMPLATE, PASSWORD_RESET_TEMPLATE, WELCOME_EMAIL_TEMPLATE } from '../config/emailTemplete.js'
 
 
 // Function to register new user
@@ -63,7 +64,7 @@ const userRegister = async (req, res) => {
 
         // Sending user a welcome email
         const sub = 'Welcome to Srma'
-        const body = `Welcome to Srma world! Your account with email: ${email} has been created successfully.`
+        const body = WELCOME_EMAIL_TEMPLATE.replace("{{email}}", email)
         await sendEmail(email, sub, body);
 
         return res
@@ -206,7 +207,8 @@ const sendVerifyOtp = async (req, res) => {
         await sendEmail(
             user.email,
             'Account verification otp',
-            `Your otp for account verification is ${otp}. Use this otp to verify the account do not share with anyone.`
+            // `Your otp for account verification is ${otp}. Use this otp to verify the account do not share with anyone.`
+            EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
         )
 
         return res.status(200).json({
@@ -315,7 +317,7 @@ const sendResetOtp = async (req, res) => {
         await sendEmail(
             email,
             'Password reset OTP',
-            `Your otp to reset password is ${otp}. This otp is only valid for 10 minutes do not share with any one. Use this otp to reset your password.`
+            PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
         )
 
         return res.status(200).json({
@@ -335,14 +337,7 @@ const sendResetOtp = async (req, res) => {
 // Reset password
 const resetPassword = async (req, res) => {
     
-    const { email, otp, newPass } = req.body
-
-    if(!email || !otp || !newPass) {
-        return res.status(400).json({
-            success: false,
-            message: 'Missing details'
-        })
-    }
+    const { email, otp, newPassword } = req.body
 
     try {
         const user = await userModel.findOne({email})
@@ -359,7 +354,7 @@ const resetPassword = async (req, res) => {
         }
 
         const salt = await bcrypt.genSalt(10)
-        const hassed_pass = await bcrypt.hash(newPass, salt)
+        const hassed_pass = await bcrypt.hash(newPassword, salt)
 
         user.password = hassed_pass
         user.resetOtp = ''

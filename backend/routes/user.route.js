@@ -14,7 +14,7 @@ userRouter.post('/verify-email', authUser, verifyEmail)
 userRouter.post('/is-auth', authUser, isAuthenticated)
 
 userRouter.post('/send-reset-otp', sendResetOtp)
-userRouter.post('/reset-pass', resetPassword)
+userRouter.post('/reset-password', resetPassword)
 
 
 export default userRouter;
