@@ -9,6 +9,9 @@ import connectDB from './config/db.config.js'
 
 const app = express()
 
+const PORT = process.env.PORT || 8000;
+
+
 app.use(json())
 app.use(cors({
     origin: process.env.CLIENT_URL,
@@ -26,5 +29,10 @@ app.get('/', (req, res) => {
     res.send(`API is working`)
 })
 
+if(process.env.NODE_ENV !== "production") {
+    app.listen(PORT, () => (
+        console.log(`Server is running on PORT ${PORT}`)
+    ))
+}
 
 export default app
