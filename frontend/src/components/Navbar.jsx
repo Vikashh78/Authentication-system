@@ -24,7 +24,11 @@ const Navbar = () => {
 
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message)
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Something went wrong. Please try again.'
+      toast.error(message)
     }
   }
 
@@ -38,7 +42,11 @@ const Navbar = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message)
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Something went wrong. Please try again.'
+      toast.error(message)
     }
   }
   
