@@ -11,10 +11,15 @@ const app = express()
 
 const PORT = process.env.PORT || 8000;
 
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    process.env.CLIENT_URL_PRODUCTION
+].filter(Boolean)
 
 app.use(json())
+
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: allowedOrigins,
     credentials: true
 }))
 app.use(cookieParser())
