@@ -12,8 +12,8 @@ const app = express()
 const PORT = process.env.PORT || 8000;
 
 const allowedOrigins = [
-    
-    'https://authentication-system-backend-liard.vercel.app'
+    process.env.CLIENT_URL_LOCAL,
+    process.env.CLIENT_URL_PRODUCTION
 ]
 
 app.use(json())
