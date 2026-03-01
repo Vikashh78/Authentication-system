@@ -6,8 +6,8 @@
 
 ## 🌐 Live Demo
 
-Frontend:   
-Backend API: 
+Frontend: https://authentication-system-frontend-c7hv0ia07.vercel.app/
+Backend API: https://authentication-system-backend-liard.vercel.app/
 
 ---
 
